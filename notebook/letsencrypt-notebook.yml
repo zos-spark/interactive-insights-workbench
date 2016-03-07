@@ -1,0 +1,27 @@
+# (c) Copyright IBM Corp. 2016.  All Rights Reserved.
+# Distributed under the terms of the Modified BSD License.
+
+version: "2"
+
+services:
+  notebook:
+    extends:
+      file: notebook.yml
+      service: notebook
+    volumes:
+     - "secrets:/etc/letsencrypt"
+    environment:
+      USE_HTTPS: "yes"
+      PASSWORD: ${PASSWORD}
+    command: >
+      /srv/start-notebook.sh
+      --NotebookApp.certfile=/etc/letsencrypt/fullchain.pem
+      --NotebookApp.keyfile=/etc/letsencrypt/privkey.pem
+
+volumes:
+  work:
+    external:
+      name: ${WORK_VOLUME}
+  secrets:
+    external:
+      name: ${SECRETS_VOLUME}
