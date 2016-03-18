@@ -11,7 +11,7 @@ echo "Bringing up MongoDB container"
 cd "$DIR"/../mongodb && docker-compose up -d
 
 # Get the MongoDB container ID
-CONTAINER_ID=$(docker ps --filter ancestor=mongo --format {{.ID}})
+CONTAINER_ID=$(docker ps --filter ancestor=mongo:3.2 --format {{.ID}})
 echo MongoDB container ID: $CONTAINER_ID
 
 # Now get the MongoDB container image ID, network ID, and IP address
