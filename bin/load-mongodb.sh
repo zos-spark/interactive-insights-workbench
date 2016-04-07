@@ -6,31 +6,40 @@ set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Bring up a MongoDB container
-echo "Bringing up MongoDB container"
-cd "$DIR"/../mongodb && docker-compose up -d
-
 # Get the MongoDB container ID
 CONTAINER_ID=$(docker ps --filter ancestor=mongo:3.2 --format {{.ID}})
+if [[ -z "$CONTAINER_ID" ]]; then
+  echo "A mongodb container does not appear to be running."
+  echo "Please start it before loading the sample data."
+  exit 1
+fi
 echo MongoDB container ID: $CONTAINER_ID
 
-# Now get the MongoDB container image ID, network ID, and IP address
+# Get the MongoDB image ID
 IMAGE_ID=$(docker inspect --format {{.Config.Image}} $CONTAINER_ID)
 echo MongoDB image: $IMAGE_ID
-NETWORK_NAME=$(docker inspect --format '{{range $key, $value := .NetworkSettings.Networks}}{{$key}}{{end}}' $CONTAINER_ID)
-echo MongoDB network: $NETWORK_NAME
-CONTAINER_IP=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $CONTAINER_ID)
-echo MongoDB container IP address: $CONTAINER_IP
 
-# Run a new Docker container that volume mounts the sample data directory on
-# the host, connects to the running MongoDB container's network, connects to
-# the MongoDB container, and imports the sample data as MongoDB collections.
-docker run --rm -it \
-  --net $NETWORK_NAME \
-  -v "$DIR"/../data:/tmp/data \
+# We don't know if the data is on the host or on a machine controlling the host
+# (using docker-machine), so we use some Docker magic to load the data:
+#
+# Create a temporary container, and have it wait until we feed it a poison pill.
+# Have it connect to the MongoDB container network so we can load the data to it
+# using 'localhost'.
+TMP_CONTAINER=$(docker run -d \
+  --net="container:$CONTAINER_ID" \
   $IMAGE_ID \
-  /bin/bash -c "for file in /tmp/data/*.csv; do
-     echo Importing \$file...
-     mongoimport --host $CONTAINER_IP --db demo \
-     --upsert --file \$file --type csv --headerline;
-   done"
+  /bin/bash -c \
+  "mkdir -p /tmp/data && while [ ! -f /tmp/data/.loaded ]; do sleep 1; done")
+# Copy the data into the temporary container
+docker cp "$DIR"/../data/*.csv $TMP_CONTAINER:/tmp/data
+# Run the mongoimport command on the temporary container and stop the container
+# by creating the poison pill.
+docker exec -it $TMP_CONTAINER \
+  /bin/bash -c \
+    "for file in /tmp/data/*.csv; do
+       echo Importing \$file...
+       mongoimport --db demo \
+       --drop --file \$file --type csv --headerline; done &&
+    touch /tmp/data/.loaded"
+# Remove the temporary container
+docker rm -f $TMP_CONTAINER >/dev/null

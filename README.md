@@ -62,26 +62,25 @@ notebook/down.sh
 
 ## Sample Database
 
-To run a [MongoDB](https://www.mongodb.com) Docker container, create a `demo` database, and load the sample data in the `data` directory as collections in the database, run the following:
+To run a [MongoDB](https://www.mongodb.com) Docker container on `mymachine`, run the following:
 
 ```
 # activate desired docker machine
 eval "$(docker-machine env mymachine)"
 
-# run MongoDB container and load sample data
+docker-compose -f mongodb/docker-compose.yml up -d
+```
+
+Once the MongoDB container is running, run the following script to create a `demo` database and load the sample data in the `data` directory as collections in the database:
+
+```
 bin/load-mongodb.sh
-```
-
-To bring up a MongoDB container:
-
-```
-cd mongodb && docker-compose up -d
 ```
 
 To bring down the MongoDB container:
 
 ```
-cd mongodb && docker-compose down
+docker-compose -f mongodb/docker-compose.yml down
 ```
 
 ## FAQ
