@@ -2,7 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 # Pin to a known release for sanity
-FROM jupyter/all-spark-notebook:9f9907cf1df8
+FROM jupyter/all-spark-singleuser:9f4ed032bada
 
 # Become root to do the apt-gets
 USER root
@@ -49,6 +49,7 @@ COPY ./samples/ /samples/
 # Use custom start-notebook script that copies sample notebooks to
 # notebook directory on startup
 COPY ./start-notebook.sh /srv/start-notebook.sh
+RUN chmod 755 /srv/start-notebook.sh
 CMD ["/srv/start-notebook.sh"]
 
 # Stay as jovyan user in the newer docker-stack images
