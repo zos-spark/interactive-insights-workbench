@@ -8,18 +8,22 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 USAGE="Usage: `basename $0` [--secure | --letsencrypt] [--password PASSWORD] [--secrets SECRETS_VOLUME]"
 
-# Parse args to determine security settings
 SECURE=${SECURE:=no}
 LETSENCRYPT=${LETSENCRYPT:=no}
+CONFIG=notebook.yml
+
+# Parse args to determine security settings
 while [[ $# > 0 ]]
 do
 key="$1"
 case $key in
     --secure)
     SECURE=yes
+    CONFIG=secure-notebook.yml
     ;;
     --letsencrypt)
     LETSENCRYPT=yes
+    CONFIG=letsencrypt-notebook.yml
     ;;
     --secrets)
     SECRETS_VOLUME="$2"
@@ -27,7 +31,6 @@ case $key in
     ;;
     --password)
     PASSWORD="$2"
-    export PASSWORD
     shift # past argument
     ;;
     *) # unknown option
@@ -43,19 +46,13 @@ if [[ "$LETSENCRYPT" == yes || "$SECURE" == yes ]]; then
     exit 1
   fi
   if [ "$LETSENCRYPT" == yes ]; then
-    CONFIG=letsencrypt-notebook.yml
     if [ -z "${SECRETS_VOLUME:+x}" ]; then
       echo "ERROR: Must set SECRETS_VOLUME if running in letsencrypt mode"
       echo "$USAGE"
       exit 1
     fi
-  else
-    CONFIG=secure-notebook.yml
   fi
-  export PORT=${PORT:=443}
-else
-  CONFIG=notebook.yml
-  export PORT=${PORT:=80}
+  PORT=${PORT:=443}
 fi
 
 # Setup environment
@@ -66,7 +63,5 @@ docker volume create --name "$WORK_VOLUME"
 
 # Bring up a notebook container, using container name as project name
 echo "Bringing up notebook '$NAME'"
-docker-compose -f "$DIR/$CONFIG" -p "$NAME" up -d
-
-IP=$(docker-machine ip $(docker-machine active))
-echo "Notebook $NAME listening on $IP:$PORT"
+exec docker-compose -f "$DIR/$CONFIG" -p "$NAME" up -d
+echo "Notebook $NAME is up"
