@@ -2,7 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 # Pin to a known release for sanity
-FROM jupyter/all-spark-singleuser:9f4ed032bada
+FROM jupyter/all-spark-notebook
 
 # Become root to do the apt-gets
 USER root
@@ -46,11 +46,12 @@ RUN $CONDA_DIR/envs/python2/bin/pip install \
 USER root
 COPY ./samples/ /samples/
 
-# Use custom start-notebook script that copies sample notebooks to
-# notebook directory on startup
-COPY ./start-notebook.sh /srv/start-notebook.sh
-RUN chmod 755 /srv/start-notebook.sh
-CMD ["/srv/start-notebook.sh"]
+# Use custom entrypoint script to copy sample notebooks to notebook directory
+# on container start
+COPY docker-entrypoint.sh /srv/docker-entrypoint.sh
+RUN chmod 755 /srv/docker-entrypoint.sh
+ENTRYPOINT ["tini", "--", "/srv/docker-entrypoint.sh"]
+CMD ["start-notebook.sh"]
 
 # Stay as jovyan user in the newer docker-stack images
 USER jovyan
