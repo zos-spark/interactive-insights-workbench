@@ -6,7 +6,7 @@ version: "2"
 services:
   notebook:
     build: .
-    image: my-notebook
+    image: zos-spark/i2w-notebook
     container_name: ${NAME}
     volumes:
      - "work:/home/jovyan/work"
