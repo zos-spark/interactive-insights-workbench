@@ -2,7 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 # Pin to a known release for sanity
-FROM jupyter/all-spark-notebook
+FROM jupyter/all-spark-notebook:2d878db5cbff
 
 # Become root to do the apt-gets
 USER root
