@@ -4,7 +4,7 @@ The Interactive Insights Workbench is a software stack that is based on the [Jup
 
 * Python 2.7.x and Python 3.x, including libraries that are commonly used for data analysis, e.g., pandas, matplotlib, etc.
 * R 3.2.x
-* Apache Toree (Scale 2.10.4)
+* Apache Toree (Scala 2.10.4)
 
 The workbench also bundles several Jupyter Notebook extensions that provide the ability to convert notebooks into interactive dashboards.  These extensions include:
 
@@ -15,24 +15,31 @@ Finally, this repo includes scripts that leverage [Docker](https://www.docker.co
 
 ## Prerequisites
 
-To build and deploy the workbench image using the scripts provided, you will need to install the following Docker technologies on your local desktop.
+To build and run the workbench image using the scripts provided, you will need to install the following Docker technologies in your environment.
 
 * [Docker Engine](https://docs.docker.com/engine/) 1.10.0+
-* [Docker Machine](https://docs.docker.com/machine/) 0.6.0+
 * [Docker Compose](https://docs.docker.com/compose/) 1.6.0+
 
-See the [installation instructions](https://docs.docker.com/engine/installation/) for your environment.
+If you plan to run the workbench on your local Mac OS X or Windows workstation, you will also need:
 
-## Quickstart
+* [Docker Machine](https://docs.docker.com/machine/) 0.6.0+
 
-To run the workbench on your local desktop, follow the steps below.  By doing so, you will:
+See the [installation instructions](https://docs.docker.com/engine/installation/).
 
-* Create a new VirtualBox virtual machine on your local desktop
+## Quickstart - Mac OS X, Windows
+
+To run the workbench on your local Mac OS X or Windows workstation, you will need to do the following:
+
+* Clone this repository to your workstation
+* Create a new VirtualBox virtual machine on your workstation
 * Build the workbench Docker image on the VM
 * Run the workbench Docker image as a Docker container on the VM
 
-
 ```
+# clone this repo
+git clone https://github.com/zos-spark/interactive-insights-workbench.git
+cd interactive-insights-workbench
+
 # create a Docker Machine-controlled VirtualBox VM on local desktop
 bin/vbox.sh mymachine
 
@@ -46,32 +53,63 @@ notebook/build.sh
 notebook/up.sh
 ```
 
-To access the workbench, visit `http://<mymachine_ip_address>:8888` in your web browser.
-
-You can retrieve the IP address using:
+Retrieve the IP address of the virtual machine.
 
 ```
 docker-machine ip mymachine
 ```
 
-To stop and remove the notebook container:
+Use your web browser to access your workbench at
 
 ```
-notebook/down.sh
+http://<mymachine_ip_address>:8888
 ```
+
+## Quickstart - Linux
+
+To run the workbench on a Linux host, follow the steps below.
+
+* Clone this repository to your host
+* Build the workbench Docker image on the host
+* Run the workbench Docker image as a Docker container on the host
+
+```
+# clone this repo
+git clone https://github.com/zos-spark/interactive-insights-workbench.git
+cd interactive-insights-workbench
+
+# build the notebook image on the machine
+notebook/build.sh
+
+# bring up the notebook container
+notebook/up.sh
+```
+
+Use your web browser to access your workbench at
+
+```
+http://<my_ip_address>:8888
+```
+
 
 ## Sample Database
 
-To run a [MongoDB](https://www.mongodb.com) Docker container on `mymachine`, run the following:
+This repository includes sample data in a CSV file.  This section describes how to run a [MongoDB](https://www.mongodb.com) Docker container and load the sample data.
+
+Windows and Mac OS X users, activate the Docker Machine where you would like to run the MongoDB container.
 
 ```
 # activate desired docker machine
 eval "$(docker-machine env mymachine)"
+```
 
+Run the container.
+
+```
 docker-compose -f mongodb/docker-compose.yml up -d
 ```
 
-Once the MongoDB container is running, run the following script to create a `demo` database and load the sample data in the `data` directory as collections in the database:
+Once the MongoDB container is running, use the `load-mongodb.sh` script to create a `demo` database and load each of the sample CSV files in the `data` directory as collections in the database:
 
 ```
 bin/load-mongodb.sh
