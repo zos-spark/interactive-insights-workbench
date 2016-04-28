@@ -19,20 +19,20 @@ RUN apt-get update && \
 USER jovyan
 
 # Install dashboard layout and preview within Jupyter Notebook
-RUN pip install jupyter_dashboards && \
+RUN pip install jupyter_dashboards==0.5.0 && \
     jupyter dashboards install --user --symlink && \
     jupyter dashboards activate
 
 # Install declarative widgets for Jupyter Notebook
-RUN pip install jupyter_declarativewidgets && \
+RUN pip install jupyter_declarativewidgets==0.5.0 && \
     jupyter declarativewidgets install --user --symlink && \
     jupyter declarativewidgets activate
 
 # Install content management to support dashboard bundler options
-RUN pip install jupyter_cms && \
+RUN pip install jupyter_cms==0.5.0 && \
     jupyter cms install --user --symlink && \
     jupyter cms activate
-RUN pip install jupyter_dashboards_bundlers && \
+RUN pip install jupyter_dashboards_bundlers==0.5.0 && \
     jupyter dashboards_bundlers activate
 
 # Install packages needed for demo notebooks (in Python 2 and 3 environments)
