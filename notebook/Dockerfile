@@ -24,7 +24,7 @@ RUN pip install jupyter_dashboards==0.5.0 && \
     jupyter dashboards activate
 
 # Install declarative widgets for Jupyter Notebook
-RUN pip install jupyter_declarativewidgets==0.5.0 && \
+RUN pip install jupyter_declarativewidgets==0.5.1 && \
     jupyter declarativewidgets install --user --symlink && \
     jupyter declarativewidgets activate
 
@@ -32,7 +32,7 @@ RUN pip install jupyter_declarativewidgets==0.5.0 && \
 RUN pip install jupyter_cms==0.5.0 && \
     jupyter cms install --user --symlink && \
     jupyter cms activate
-RUN pip install jupyter_dashboards_bundlers==0.5.0 && \
+RUN pip install jupyter_dashboards_bundlers==0.7.0 && \
     jupyter dashboards_bundlers activate
 
 # Install packages needed for demo notebooks (in Python 2 and 3 environments)
