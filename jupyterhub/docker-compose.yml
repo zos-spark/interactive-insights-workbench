@@ -1,0 +1,10 @@
+# (c) Copyright IBM Corp. 2016.  All Rights Reserved.
+# Distributed under the terms of the Modified BSD License.
+
+version: "2"
+
+services:
+  notebook:
+    build:
+      context: ../notebook
+    image: zos-spark/i2w-notebook
