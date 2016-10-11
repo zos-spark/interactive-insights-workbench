@@ -5,7 +5,13 @@ version: "2"
 
 services:
   notebook:
-    build: .
+    build:
+      context: .
+      args:
+        DASHBOARDS_VER: '0.6.*'
+        DECLWIDGETS_VER: '0.7.*'
+        CMS_VER: '0.5.*'
+        BUNDLER_VER: '0.8.*'
     image: zos-spark/i2w-notebook
     container_name: ${NAME}
     volumes:
